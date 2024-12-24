@@ -10,7 +10,7 @@ import json
 import sys
 import ssl
 
-from pipecad import *
+from lib.pipecad import *
 
 class dlgUpdateFromGithub(QDialog):
     def __init__(self, parent = None):

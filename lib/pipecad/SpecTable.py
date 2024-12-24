@@ -20,7 +20,7 @@ from PythonQt.QtCore import *
 from PythonQt.QtGui import *
 from PythonQt.QtSql import *
 
-from pipecad import *
+from lib.pipecad import *
 
 
 class TableWorldDialog(QDialog):

@@ -19,7 +19,7 @@
 
 from PythonQt.QtCore import *
 from PythonQt.QtGui import *
-from pipecad import *
+from lib.pipecad import *
 import omp
 import omp.newproject
 

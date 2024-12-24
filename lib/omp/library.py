@@ -1,7 +1,7 @@
 from PythonQt.QtCore import *
 from PythonQt.QtGui import *
 
-from pipecad import *
+from lib.pipecad import *
 
 import os
 import imp

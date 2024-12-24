@@ -23,7 +23,7 @@ from PythonQt.QtGui import *
 from PythonQt.QtSql import *
 from PythonQt.pipecad import *
 
-from pipecad import *
+from lib.pipecad import *
 
 
 class PcfExporterDlg(QDialog):
