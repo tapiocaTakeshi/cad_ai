@@ -5,6 +5,11 @@ import flet as ft
 import uuid
 from lib.pipecad.commands import CommandHistory, AddObjectCommand, DeleteObjectCommand, DuplicateObjectCommand
 
+# PyVistaのグローバル設定
+pv.global_theme.background = 'white'
+pv.global_theme.window_size = [800, 600]
+pv.global_theme.smooth_shading = True
+
 class Viewer3D(ft.UserControl):
     def __init__(self):
         super().__init__()
@@ -21,6 +26,9 @@ class Viewer3D(ft.UserControl):
         self.on_selection_change = None
         self.last_click_position = None
         self.command_history = CommandHistory()
+        self.grid_visible = True  # グリッドの可視性を初期化
+        self.grid_size = 10
+        self.grid_spacing = 1.0
         self.view_presets = {
             "正面": {"azimuth": 0, "elevation": 0},
             "上面": {"azimuth": 0, "elevation": 90},
@@ -29,21 +37,31 @@ class Viewer3D(ft.UserControl):
         }
 
     def initialize_plotter(self):
-        self.plotter = pv.Plotter(off_screen=True)
-        self.plotter.background_color = '#ffffff'
-        self.plotter.window_size = [800, 600]
-        
-        # グリッドの追加
-        grid = pv.Plane(i_size=10, j_size=10, i_resolution=10, j_resolution=10)
-        self.plotter.add_mesh(grid, color='gray', opacity=0.5)
-        
-        # 座標軸の追加
-        self.plotter.add_axes()
-        
-        self.update_camera()
-        self.update_view()
-        
-        print("Plotter initialized:", self.plotter is not None)  # デバッグ用
+        try:
+            # オフスクリーンレンダリングを使用
+            pv.start_xvfb()  # X Virtual Framebufferを開始
+            self.plotter = pv.Plotter(off_screen=True)
+            self.plotter.background_color = '#ffffff'
+            self.plotter.window_size = [800, 600]
+            
+            # グリッドの追加
+            grid = pv.Plane(i_size=10, j_size=10, i_resolution=10, j_resolution=10)
+            self.plotter.add_mesh(grid, color='gray', opacity=0.5)
+            
+            # 座標軸の追加
+            self.plotter.add_axes()
+            
+            self.update_camera()
+            
+            # スクリーンショットを保存
+            print(f"Saving screenshot to {self.screenshot_path}")
+            self.plotter.screenshot(str(self.screenshot_path))
+            
+            print("Plotter initialized successfully")
+            return True
+        except Exception as e:
+            print(f"Error initializing plotter: {e}")
+            return False
 
     def update_camera(self):
         # 球面座標からカメラ位置を計算
@@ -57,8 +75,14 @@ class Viewer3D(ft.UserControl):
         if self.plotter is None:
             print("Plotter is not initialized")
             return
-        self.plotter.screenshot(str(self.screenshot_path))
-        self.update()
+        try:
+            # オフスクリーンレンダリングを使用
+            self.plotter.render_offscreen = True
+            self.plotter.screenshot(str(self.screenshot_path))
+            print(f"Screenshot saved to {self.screenshot_path}")
+            self.update()
+        except Exception as e:
+            print(f"Error updating view: {e}")
 
     def add_cube(self, position=(0, 0, 0), size=1.0):
         obj_id = str(uuid.uuid4())
@@ -170,7 +194,7 @@ class Viewer3D(ft.UserControl):
 
     def handle_mouse_wheel(self, e: ft.ScrollEvent):
         # ズーム処理
-        if e.delta_y > 0:
+        if e.scroll_delta_y > 0:
             self.camera_distance *= 0.9
         else:
             self.camera_distance *= 1.1
@@ -281,13 +305,17 @@ class Viewer3D(ft.UserControl):
 
     def build(self):
         if self.plotter is None:
-            self.initialize_plotter()
+            success = self.initialize_plotter()
+            if not success:
+                return ft.Text("Failed to initialize 3D viewer")
             
         return ft.GestureDetector(
             content=ft.Container(
                 content=ft.Image(
                     src=str(self.screenshot_path),
                     fit=ft.ImageFit.CONTAIN,
+                    width=800,
+                    height=600,
                 ),
                 border=ft.border.all(1, ft.colors.GREY_400),
                 expand=True
@@ -297,5 +325,4 @@ class Viewer3D(ft.UserControl):
             on_pan_end=lambda _: setattr(self, 'is_dragging', False),
             on_scroll=self.handle_mouse_wheel,
             on_tap=self.handle_click,
-            on_key_event=self.handle_key,
         ) 

@@ -11,6 +11,11 @@ def main():
         page.theme_mode = ft.ThemeMode.SYSTEM
         page.padding = 10
         
+        viewer = Viewer3D()
+        
+        # キーボードイベントハンドラを設定
+        page.on_keyboard_event = viewer.handle_key
+        
         def open_project_dialog():
             def close_dlg():
                 dlg.open = False
@@ -36,9 +41,6 @@ def main():
             viewer.initialize_plotter()  # plotterを再初期化
             page.update()
 
-        viewer = Viewer3D()
-        viewer.initialize_plotter()  # ページに追加する前に初期化
-
         def add_sample_geometry(_):
             viewer.add_cube(position=(1, 1, 0))
             viewer.add_cylinder(start=(0, 0, 0), end=(0, 0, 2))
@@ -54,45 +56,45 @@ def main():
         toolbar = ft.Row(
             controls=[
                 ft.IconButton(
-                    icon=ft.icons.SAVE,
+                    icon=ft.Icons.SAVE,
                     tooltip="保存",
                     on_click=lambda _: print("Save")
                 ),
                 ft.VerticalDivider(width=1),
                 ft.IconButton(
-                    icon=ft.icons.UNDO,
+                    icon=ft.Icons.UNDO,
                     tooltip="元に戻す",
                     on_click=lambda _: viewer.command_history.undo() and viewer.update_view()
                 ),
                 ft.IconButton(
-                    icon=ft.icons.REDO,
+                    icon=ft.Icons.REDO,
                     tooltip="やり直し",
                     on_click=lambda _: viewer.command_history.redo() and viewer.update_view()
                 ),
                 ft.VerticalDivider(width=1),
                 ft.IconButton(
-                    icon=ft.icons.CONTENT_COPY,
+                    icon=ft.Icons.CONTENT_COPY,
                     tooltip="複製 (Ctrl+D)",
                     on_click=lambda _: viewer.duplicate_selected_object()
                 ),
                 ft.IconButton(
-                    icon=ft.icons.DELETE,
+                    icon=ft.Icons.DELETE,
                     tooltip="削除 (Delete)",
                     on_click=lambda _: viewer.handle_key(ft.KeyboardEvent(key="Delete"))
                 ),
                 ft.VerticalDivider(width=1),
                 ft.IconButton(
-                    icon=ft.icons.GRID_4X4,
+                    icon=ft.Icons.GRID_4X4,
                     tooltip="グリッド表示切替",
                     on_click=lambda _: viewer.toggle_grid()
                 ),
                 ft.IconButton(
-                    icon=ft.icons.VIEW_IN_AR,
+                    icon=ft.Icons.VIEW_IN_AR,
                     tooltip="3Dビュー",
                     on_click=toggle_3d_view
                 ),
                 ft.IconButton(
-                    icon=ft.icons.ADD_BOX,
+                    icon=ft.Icons.ADD_BOX,
                     tooltip="サンプル形状追加",
                     on_click=add_sample_geometry
                 ),
@@ -108,18 +110,18 @@ def main():
             min_extended_width=200,
             destinations=[
                 ft.NavigationRailDestination(
-                    icon=ft.icons.FOLDER_OUTLINED,
-                    selected_icon=ft.icons.FOLDER,
+                    icon=ft.Icons.FOLDER_OUTLINED,
+                    selected_icon=ft.Icons.FOLDER,
                     label="プロジェクト"
                 ),
                 ft.NavigationRailDestination(
-                    icon=ft.icons.ARCHITECTURE_OUTLINED,
-                    selected_icon=ft.icons.ARCHITECTURE,
+                    icon=ft.Icons.ARCHITECTURE_OUTLINED,
+                    selected_icon=ft.Icons.ARCHITECTURE,
                     label="モデリング"
                 ),
                 ft.NavigationRailDestination(
-                    icon=ft.icons.SETTINGS_OUTLINED,
-                    selected_icon=ft.icons.SETTINGS,
+                    icon=ft.Icons.SETTINGS_OUTLINED,
+                    selected_icon=ft.Icons.SETTINGS,
                     label="設定"
                 ),
             ],
@@ -164,12 +166,12 @@ def main():
                     controls=[
                         ft.ElevatedButton(
                             text="プロジェクトを開く",
-                            icon=ft.icons.FOLDER_OPEN,
+                            icon=ft.Icons.FOLDER_OPEN,
                             on_click=lambda _: open_project_dialog()
                         ),
                         ft.ElevatedButton(
                             text="新規プロジェクト",
-                            icon=ft.icons.ADD,
+                            icon=ft.Icons.ADD,
                             on_click=lambda _: create_new_project()
                         ),
                     ],
