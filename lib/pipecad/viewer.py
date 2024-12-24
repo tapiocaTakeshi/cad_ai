@@ -31,10 +31,10 @@ class Viewer3D(ft.UserControl):
     def initialize_plotter(self):
         self.plotter = pv.Plotter(off_screen=True)
         self.plotter.background_color = '#ffffff'
-        self.plotter.set_window_size(800, 600)
+        self.plotter.window_size = [800, 600]
         
         # グリッドの追加
-        grid = pv.Grid(dimensions=(10, 10, 1))
+        grid = pv.Plane(i_size=10, j_size=10, i_resolution=10, j_resolution=10)
         self.plotter.add_mesh(grid, color='gray', opacity=0.5)
         
         # 座標軸の追加

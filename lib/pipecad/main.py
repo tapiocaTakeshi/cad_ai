@@ -1,9 +1,9 @@
 import flet as ft
 from pathlib import Path
-from lib.pipecad.viewer import Viewer3D
-from lib.pipecad.property_panel import PropertyPanel
-from lib.pipecad.object_list import ObjectListPanel
-from lib.pipecad.settings_panel import SettingsPanel
+from .viewer import Viewer3D
+from .property_panel import PropertyPanel
+from .object_list import ObjectListPanel
+from .settings_panel import SettingsPanel
 
 def main():
     def page_setup(page: ft.Page):
@@ -34,11 +34,11 @@ def main():
             # ビューアをリセット
             viewer.objects.clear()
             viewer.initialize_plotter()  # plotterを再初期化
-            viewer.update_view()
             page.update()
 
         viewer = Viewer3D()
-        
+        viewer.initialize_plotter()  # ページに追加する前に初期化
+
         def add_sample_geometry(_):
             viewer.add_cube(position=(1, 1, 0))
             viewer.add_cylinder(start=(0, 0, 0), end=(0, 0, 2))
@@ -181,7 +181,7 @@ def main():
 
         # メインコンテンツエリア
         content_area = ft.Container(
-            content=welcome_content,
+            content=viewer,  # ここでViewer3Dをページに追加
             padding=20,
             expand=True
         )
